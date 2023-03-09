@@ -10,18 +10,13 @@ public:
   Button(uint8_t mux, uint8_t muxpin);
   void handle();
   void handle(bool input);
-  bool pressed();
-  bool released();
   bool engaged();
   void setCommand(int cmdPush);
-  int getCommand();
-  void handleCommand();
-  void handleCommand(bool input);
+  int  getCommand();
 protected:
   uint8_t _mux;
   uint8_t _pin;
   uint8_t _state;
-  uint8_t _transition;
   int _cmdPush;
 };
 

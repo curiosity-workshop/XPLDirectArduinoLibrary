@@ -42,36 +42,16 @@ void Button::handle(bool input)
     if (_state == 0)
     {
       _state = DEBOUNCE_DELAY;
-      _transition = ePressed;
+      XP.commandStart(_cmdPush);
     }
   }
   else if (_state > 0)
   {
     if (--_state == 0)
     {
-      _transition = eReleased;
+      XP.commandEnd(_cmdPush);
     }
   }
-}
-
-bool Button::pressed()
-{
-  if (_transition == ePressed)
-  {
-    _transition = eNone;
-    return true;
-  }
-  return false;
-}
-
-bool Button::released()
-{
-  if (_transition == eReleased)
-  {
-    _transition = eNone;
-    return true;
-  }
-  return false;
 }
 
 bool Button::engaged()
@@ -87,32 +67,6 @@ void Button::setCommand(int cmdPush)
 int Button::getCommand()
 {
   return _cmdPush;
-}
-
-void Button::handleCommand()
-{
-  handle();
-  if (pressed())
-  {
-    XP.commandStart(_cmdPush);
-  }
-  if (released())
-  {
-    XP.commandEnd(_cmdPush);
-  }
-}
-
-void Button::handleCommand(bool input)
-{
-  handle(input);
-  if (pressed())
-  {
-    XP.commandStart(_cmdPush);
-  }
-  if (released())
-  {
-    XP.commandEnd(_cmdPush);
-  }
 }
 
 RepeatButton::RepeatButton(uint8_t mux, uint8_t pin, uint32_t delay) : Button(mux, pin)
@@ -137,13 +91,13 @@ void RepeatButton::handle(bool input)
     if (_state == 0)
     {
       _state = DEBOUNCE_DELAY;
-      _transition = ePressed;
+       XP.commandStart(_cmdPush);
       _timer = millis() + _delay;
     }
     else if (_delay > 0 && (millis() >= _timer))
     {
       _state = DEBOUNCE_DELAY;
-      _transition = ePressed;
+      XP.commandStart(_cmdPush);
       _timer += _delay;
     }
   }
@@ -151,7 +105,7 @@ void RepeatButton::handle(bool input)
   {
     if (--_state == 0)
     {
-      _transition = eReleased;
+      XP.commandEnd(_cmdPush);
     }
   }
 }
