@@ -22,6 +22,39 @@ Known issues:
     Arduino Uno with I2c display seems to interfere with serial dialog between the arduino and Xplane.
     Incompatibility with some bluetooth serial port installations
 
+    Remember to close your serial monitor if it is open, it will tie up the serial port and your device won't be found.
+
+** 03/16/2023
+
+   -- Removed variable attachment to commands, it never made sense.  If you were utilizing this you can manually trigger commands with:
+            int commandTrigger(int commandHandle);                                  // triggers specified command 1 time;
+            int commandTrigger(int commandHandle, int triggerCount);                // triggers specified command triggerCount times.  
+            int commandStart(int commandHandle);                                    // Avoid this unless you know what you are doing.  Command "begins" must be balanced with command "ends"
+            int commandEnd(int commandHandle);
+
+    -- Bug fixed with commands.  If they were behaving oddly for you it should be fixed.
+
+    -- additional messages have been added to the status screen to indicate the last dataref sent/received and also command interactions
+
+    -- a message has been added to the protocol to indicate that xplane has shut down normally or if the active plane is unloaded.  If xplane restarts or 
+        another aircraft is loaded, the plugin will query the XPLDirect devices again.
+
+        This enhances the connectionStatus() function to be more accurate.
+
+            eg:  if (!connectionStatus()) { doShutDownStuff(); }
+
+        A callback feature could be easily added to do stuff in the event xplane sends the message as well.
+
+
+    -- multiple iterations of a command enabled.  This is mostly for rotary encoder implementation.  
+                        
+                        int XPLDirect::commandTrigger(int commandHandle, int triggerCount)
+
+        The triggerCount parameter has been there but didn't work due to xplane only allowing one command trigger per cycle. 
+        Now if you send a value greater than 1 there is an accumulator that will trigger the command every cycle until the accumulator is back to zero.
+
+
+
 ** 03/06/2023 
     -- added file "abbreviations.txt" in the plugin directory.  This allows you to use abbreviations for dataref and command names for the purpose of conserving RAM space
         on your arduino device.  For instance if you want to reference the beacon light status with the dataref "sim/cockpit/electrical/beacon_lights_on", 

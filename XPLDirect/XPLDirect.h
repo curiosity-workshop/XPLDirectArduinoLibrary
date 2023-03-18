@@ -1,6 +1,8 @@
 ﻿/*
   XPLDirect.h - Library for serial interface to Xplane SDK.
-  Created by Michael Gerlicher,  September 2020.
+  Created by Curiosity Workshop, Michael Gerlicher,  2020-2023
+
+  See readme.txt file for information on updates.
 
   To report problems, download updates and examples, suggest enhancements or get technical support, please visit:
      
@@ -39,7 +41,7 @@
 #define XPLDIRECT_BAUDRATE 115200           // don't mess with this, it needs to match the plugin which won't change
 #define XPLDIRECT_PACKETHEADER  '<'         // ...or this
 #define XPLDIRECT_PACKETTRAILER '>'         // ...or this                                                                           
-#define XPLDIRECT_VERSION 2106171           // The plugin will start to verify that a compatible version is being used
+#define XPLDIRECT_VERSION 2303141           // The plugin will start to verify that a compatible version is being used
 #define XPLDIRECT_ID 0                      // Used for relabled plugins to identify the company.  0 = normal distribution version
 
 
@@ -77,6 +79,7 @@
 #define XPLCMD_COMMANDEND           'j'
 #define XPLCMD_COMMANDTRIGGER       'k'   //  %3.3i%3.3i   command handle, number of triggers
 #define XPLCMD_SENDVERSION          'v'     // we will respond with current build version
+#define XPL_EXITING                 'x'     // MG 03/14/2023: xplane sends this to the arduino device during normal shutdown of xplane.  It may not happen if xplane crashes.
 #define XPL_READ		1
 #define XPL_WRITE       2
 #define XPL_READWRITE	3
@@ -201,7 +204,7 @@ class XPLDirect
         const char* commandName;
         const __FlashStringHelper* FcommandName;
         long int lastUpdateTime;
-        int *latestValue;
+        //int *latestValue;
         int lastSentValue;
         int pin;
 
@@ -212,6 +215,7 @@ class XPLDirect
 
     int _dataRefsCount;
     int _commandsCount;
+   
     byte _allDataRefsRegistered;            // becomes true if all datarefs have been registered
     byte _datarefsUpdatedFlag;                // becomes true if any datarefs have been updated from xplane since last call to datarefsUpdated()
     

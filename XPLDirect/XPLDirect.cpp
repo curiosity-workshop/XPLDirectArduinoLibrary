@@ -27,6 +27,7 @@ void XPLDirect::begin(const char * devicename)
 	_connectionStatus = 0;
 	_dataRefsCount = 0;
 	_commandsCount = 0;
+	
 	_allDataRefsRegistered = 0;
 	
 	_receiveBuffer[0] = 0;
@@ -138,7 +139,9 @@ int XPLDirect::xloop(void)
 				}
 					
 			}
-			else								// process for normal variables
+
+			// MG 15 March 2023:   This functionality removed
+	/*		else								// process for normal variables
 			{
 					
 				if (_commands[i]->latestValue != NULL && *(int *)_commands[i]->latestValue != _commands[i]->lastSentValue)
@@ -153,7 +156,7 @@ int XPLDirect::xloop(void)
 
 				}
 			}
-
+*/
 
 		}
 
@@ -175,7 +178,7 @@ int XPLDirect::commandTrigger(int commandHandle, int triggerCount)
 	if (!_commands[commandHandle]) return -1;			// inactive command
 
 	_sendPacketInt(XPLCMD_COMMANDTRIGGER, _commands[commandHandle]->commandHandle, (long int)triggerCount);
-//streamPtr->print("triggering command ");  streamPtr->print(_commands[commandHandle]->commandHandle);  streamPtr->print(" ");  streamPtr->println(triggerCount);
+//sendDebugMessage("triggering command ");  //streamPtr->print(_commands[commandHandle]->commandHandle);  streamPtr->print(" ");  streamPtr->println(triggerCount);
 	return 0;
 }
 
@@ -382,6 +385,12 @@ void XPLDirect::_processPacket()
 	{
 		case XPLCMD_RESET :
 		{  
+			_connectionStatus = false;
+			break;
+		}
+
+		case XPL_EXITING :					// MG 03/14/2023:  Added protocol code so the device will know if xplane has shut down normally.
+		{
 			_connectionStatus = false;
 			break;
 		}
@@ -1046,6 +1055,9 @@ int XPLDirect::registerDataRef(const char* datarefName, int rwmode, unsigned int
 	return _dataRefsCount - 1;
 }
 
+
+/*			MG 15 March 2023:  This functionality removed.  Use commandtriggers or pin assignments
+
 #ifdef XPL_USE_PROGMEM
 int XPLDirect::registerCommand(const __FlashStringHelper* commandName, int* value)
 {
@@ -1069,6 +1081,8 @@ int XPLDirect::registerCommand(const __FlashStringHelper* commandName, int* valu
 }
 
 #endif
+
+
 
 int XPLDirect::registerCommand(const char* commandName, int* value)
 {
@@ -1116,6 +1130,8 @@ int XPLDirect::registerCommand(const __FlashStringHelper* commandName, int pin)	
 }
 #endif
 
+*/
+
 int XPLDirect::registerCommand(const char* commandName, int pin)		// associate a digital pin with an xplane command
 {
 
@@ -1123,7 +1139,7 @@ int XPLDirect::registerCommand(const char* commandName, int pin)		// associate a
 	_commands[_commandsCount] = new _commandStructure;
 	_commands[_commandsCount]->FcommandName = NULL;
 	_commands[_commandsCount]->commandName = commandName;
-	_commands[_commandsCount]->latestValue = NULL;			// default to "not pressed" for now
+//	_commands[_commandsCount]->latestValue = NULL;			// default to "not pressed" for now  (functionality removed)
 	_commands[_commandsCount]->lastSentValue = 1;      // assume not pressed for digital switches (0 = pressed)
 	_commands[_commandsCount]->commandHandle = -1;      // invalid until assigned by xplane
 	_commands[_commandsCount]->pin = pin;				// pin to use
@@ -1147,7 +1163,7 @@ int XPLDirect::registerCommand(const __FlashStringHelper* commandName)		// user 
 
 	_commands[_commandsCount]->FcommandName = commandName;
 	_commands[_commandsCount]->commandName = NULL;
-	_commands[_commandsCount]->latestValue = NULL;			// default to "not pressed" for now
+//	_commands[_commandsCount]->latestValue = NULL;			// default to "not pressed" for now
 	_commands[_commandsCount]->lastSentValue = 1;      // assume not pressed for digital switches (0 = pressed)
 	_commands[_commandsCount]->commandHandle = -1;      // invalid until assigned by xplane
 	_commands[_commandsCount]->pin = -1;				// pin to use
@@ -1167,7 +1183,7 @@ int XPLDirect::registerCommand(const char* commandName)		// user will trigger co
 	_commands[_commandsCount] = new _commandStructure;
 	_commands[_commandsCount]->FcommandName = NULL;
 	_commands[_commandsCount]->commandName = commandName;
-	_commands[_commandsCount]->latestValue = NULL;			// default to "not pressed" for now
+//	_commands[_commandsCount]->latestValue = NULL;			// default to "not pressed" for now
 	_commands[_commandsCount]->lastSentValue = 1;      // assume not pressed for digital switches (0 = pressed)
 	_commands[_commandsCount]->commandHandle = -1;      // invalid until assigned by xplane
 	_commands[_commandsCount]->pin = -1;				// pin to use
